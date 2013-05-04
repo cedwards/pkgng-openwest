@@ -6,14 +6,31 @@ Next Generation Package Management in FreeBSD
  - May 2-4, 2013
  - Christer Edwards
 
+=======
 History
 =======
+
+Background
+==========
 
 ``pkgng`` is an improved replacement for the traditional FreeBSD package management
 tools, offering many features that make dealing with binary packages faster and
 easier. 
 
 The first release of pkgng was in August, 2012.
+
+Why pkgng?
+==========
+
+The current pkg_install tools are showing their age, are hard to maintain,
+and they lack features:
+
+ - missing metadata
+ - no upgrade support
+ - no repository support
+ - no fine dependency tracking
+ - no modern binary package management
+ - and many others
 
 What it is not
 ==============
@@ -29,6 +46,32 @@ What it is
  - a tool to deal with binary packages
  - a tool to upgrade/install packages from a remote repository
  - a library that provides all the package management in a safe way so one can write a new frontend
+
+Tools natively supporting pkgng
+===============================
+
+  - ports-mgmt/portmaster
+  - ports-mgmt/portupgrade
+  - ports-mgmt/pkg_cutleaves
+  - ports-mgmt/poudriere
+  - ports-mgmt/portdowngrade
+  - ports-mgmt/tinderbox
+  - ports-mgmt/portbuilder
+  - sysutils/bsdstats
+
+Third-party Support
+===================
+
+  - SaltStack
+  - cfengine
+  - Puppet
+  - PackageKit
+
+===============
+Getting Started
+===============
+
+pkgng can be installed on FreeBSD systems using the ports tree or binary packages.
 
 Getting Started (>=9.1)
 =======================
@@ -85,7 +128,7 @@ To ensure the FreeBSD Ports Collection registers new software with ``pkgng``, an
 not ``pkg_install``, FreeBSD versions earlier than 10.X require this line in
 ``/etc/make.conf``::
 
-    WITH_PKGNG= yes
+    WITH_PKGNG=YES
 
 Configuring the pkgng Environment
 =================================
@@ -149,6 +192,14 @@ Usage Information
 Usage information for pkgng is available in the ``pkg(8)`` manual page, or by
 running ``pkg`` without additional arguments.
 
+.. code-block:: bash
+
+    # pkg help
+    # man pkg
+
+Usage Information (Example)
+---------------------------
+
 Each ``pkgng`` command argument is documented in a command-specific manual page. To
 read the manual page for pkg install, for example, run either:
 
@@ -165,12 +216,6 @@ Information about all installed packages is available by running:
 .. code-block:: bash
 
     # pkg info
-
-Information about a specific package is available by running:
-
-.. code-block:: bash
-
-    # pkg info packagename
 
 Querying Installed Packages (Example)
 -------------------------------------
@@ -245,7 +290,7 @@ Upgrading Installed Packages
 
 Packages that are outdated can be found with pkg version. If a local ports tree
 does not exist, pkg-version(8) will use the remote repository catalogue,
-otherwise the local ports tree will be used to identify package versions.:
+otherwise the local ports tree will be used to identify package versions.
 
 .. code-block:: bash
 
@@ -338,3 +383,120 @@ To remove the outdated binary packages, run:
 
     # pkg clean
 
+==================
+Implementing pkgng
+==================
+
+The current problem with pkgng is that there are no publicly available 
+packages. The current solution is to create your own repository for the
+packgaes you need.
+
+poudriere
+=========
+
+poudriere is a BSD-2 licensed tool primarily designed to test package
+production on FreeBSD. However, most people will find it useful to bulk build
+ports for FreeBSD.
+
+Its goals are to use modern facilities present in FreeBSD (as ZFS, jails), to
+be easy to use, to depend only on base, and to be parallel.
+
+It is able to build the whole portstree like tinderbox does.
+
+poudriere is able to build packages for versions of FreeBSD that are different
+from the box on which it is installed, and also to build packages for i386 if
+the host is an amd64 box.
+
+Install poudriere
+=================
+
+.. code-block:: bash
+
+    make -C /usr/ports/ports-mgmt/poudriere install clean
+
+What does poudriere require?
+============================
+
+ - a recent FreeBSD (>= 8.3)
+ - a ZFS pool with at least 7GB of free space root access
+
+/usr/local/etc/poudriere.conf
+=============================
+
+.. code-block:: bash
+
+    BASEFS=/poudriere
+    ZPOOL=myzpool
+    FREEBSD_HOST=ftp://ftp.freebsd.org
+    POUDRIERE_DATA=/poudriere_data
+    RESOLV_CONF=/etc/resolv.conf
+    DISTFILES_CACHE=/usr/ports/distfiles
+
+create ports tree
+=================
+
+.. code-block:: bash
+
+    poudriere ports -c
+
+create the build jail
+=====================
+
+.. code-block:: bash
+
+    poudriere jail -c -j 91amd64 -v 9.1-RELEASE -a amd64
+    poudriere jail -c -j 91i386 -v 9.1-RELEASE -a i386
+
+pkgng compatibility
+===================
+
+.. code-block:: bash
+
+    mkdir /usr/local/etc/poudriere.d
+    echo "WITH_PKGNG=yes" > /usr/local/etc/poudriere.d/91amd64-make.conf
+    echo "WITH_PKGNG=yes" > /usr/local/etc/poudriere.d/91i386-make.conf
+
+Configuring options
+===================
+
+Package options can be configured using the options subcommand.
+
+.. code-block:: bash
+
+    poudriere options -j 91amd64 -f ~/package.list
+
+Begin bulk build
+================
+
+.. code-block:: bash
+
+    cat ~/package.list
+    editors/vim-lite
+    www/nginx
+
+.. code-block:: bash
+
+    poudriere bulk -f ~/package.list -j 91amd64
+    poudriere bulk -f ~/package.list -l 91i386
+
+Serve the content
+=================
+
+ - nginx, apache, etc serves up the $POUDRIERE_DATA directory
+ - point PACKAGESITE to this webserver
+ - ???
+ - profit!
+
+
+Development
+===========
+
+ - IRC channel: #pkgng@freenode
+ - GIT repo: https://github.com/pkgng/pkgng
+
+Credits
+=======
+
+ - Christer Edwards
+ - christer.edwards@gmail.com
+ - https://github.com/cedwards/pkgng-openwest.git
