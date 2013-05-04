@@ -1,0 +1,554 @@
+
+<!DOCTYPE html>
+
+
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Next Generation Package Management in FreeBSD &mdash; Next Generation Package Management in FreeBSD 2013-04-29 documentation</title>
+    
+    <link rel="stylesheet" href="_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/styles.css" type="text/css" />
+    <link rel="stylesheet" href="_static/single.css" type="text/css" />
+    
+
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '2013-04-29',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/common.js"></script>
+    <script type="text/javascript" src="_static/slides.js"></script>
+    <script type="text/javascript" src="_static/sync.js"></script>
+    <script type="text/javascript" src="_static/controller.js"></script>
+    <script type="text/javascript" src="_static/init.js"></script>
+    <link rel="top" title="Next Generation Package Management in FreeBSD 2013-04-29 documentation" href="#" /> 
+  </head>
+  <body>
+
+<section
+   id="slide_container"
+   class='slides layout-regular'>
+
+
+  <article class="slide level-1" id="next-generation-package-management-in-freebsd">
+<h1>Next Generation Package Management in FreeBSD</h1>
+<blockquote>
+<div><ul class="simple">
+<li>OpenWest 2013</li>
+<li>May 2-4, 2013</li>
+<li>Christer Edwards</li>
+</ul>
+</div></blockquote>
+
+</article>
+<article class="slide level-1" id="history">
+<h1>History</h1>
+
+</article>
+<article class="slide level-2" id="background">
+<h2>Background</h2>
+<p><tt class="docutils literal"><span class="pre">pkgng</span></tt> is an improved replacement for the traditional FreeBSD package management
+tools, offering many features that make dealing with binary packages faster and
+easier.</p>
+<p>The first release of pkgng was in August, 2012.</p>
+
+</article>
+<article class="slide level-2" id="why-pkgng">
+<h2>Why pkgng?</h2>
+<p>The current pkg_install tools are showing their age, are hard to maintain,
+and they lack features:</p>
+<blockquote>
+<div><ul class="simple">
+<li>missing metadata</li>
+<li>no upgrade support</li>
+<li>no repository support</li>
+<li>no fine dependency tracking</li>
+<li>no modern binary package management</li>
+<li>and many others</li>
+</ul>
+</div></blockquote>
+
+</article>
+<article class="slide level-2" id="what-it-is-not">
+<h2>What it is not</h2>
+<blockquote>
+<div><ul class="simple">
+<li>a ports management tool (i.e. it doesn't know how to build a port)</li>
+<li>a replacement for <tt class="docutils literal"><span class="pre">portupgrade</span></tt>/<tt class="docutils literal"><span class="pre">portmaster</span></tt></li>
+</ul>
+</div></blockquote>
+
+</article>
+<article class="slide level-2" id="what-it-is">
+<h2>What it is</h2>
+<blockquote>
+<div><ul class="simple">
+<li>a replacement for pkg_* tools</li>
+<li>a tool to query/manage installed packages</li>
+<li>a tool to deal with binary packages</li>
+<li>a tool to upgrade/install packages from a remote repository</li>
+<li>a library that provides all the package management in a safe way so one can write a new frontend</li>
+</ul>
+</div></blockquote>
+
+</article>
+<article class="slide level-2" id="tools-natively-supporting-pkgng">
+<h2>Tools natively supporting pkgng</h2>
+<blockquote>
+<div><ul class="simple">
+<li>ports-mgmt/portmaster</li>
+<li>ports-mgmt/portupgrade</li>
+<li>ports-mgmt/pkg_cutleaves</li>
+<li>ports-mgmt/poudriere</li>
+<li>ports-mgmt/portdowngrade</li>
+<li>ports-mgmt/tinderbox</li>
+<li>ports-mgmt/portbuilder</li>
+<li>sysutils/bsdstats</li>
+</ul>
+</div></blockquote>
+
+</article>
+<article class="slide level-2" id="third-party-support">
+<h2>Third-party Support</h2>
+<blockquote>
+<div><ul class="simple">
+<li>SaltStack</li>
+<li>cfengine</li>
+<li>Puppet</li>
+<li>PackageKit</li>
+</ul>
+</div></blockquote>
+
+</article>
+<article class="slide level-1" id="getting-started">
+<h1>Getting Started</h1>
+<p>pkgng can be installed on FreeBSD systems using the ports tree or binary packages.</p>
+
+</article>
+<article class="slide level-2" id="getting-started-9-1">
+<h2>Getting Started (&gt;=9.1)</h2>
+<p>FreeBSD 9.1 and later includes a &quot;bootstrap&quot; utility for <tt class="docutils literal"><span class="pre">pkgng</span></tt>. The bootstrap
+utility will download and install <tt class="docutils literal"><span class="pre">pkgng</span></tt>.</p>
+<p>To bootstrap the system, run</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="c"># /usr/sbin/pkg</span>
+</pre></div>
+</div>
+
+</article>
+<article class="slide level-2" id="id1">
+<h2>Getting Started (&lt;9.1)</h2>
+<p>For earlier FreeBSD versions, <tt class="docutils literal"><span class="pre">pkgng</span></tt> must be installed from the Ports
+Collection, or as a binary package.</p>
+<p>To install the <tt class="docutils literal"><span class="pre">pkgng</span></tt> port, run:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="c"># make -C /usr/ports/ports-mgmt/pkg install clean</span>
+</pre></div>
+</div>
+<p>To install the binary package, run:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="c"># pkg_add -r pkg</span>
+</pre></div>
+</div>
+
+</article>
+<article class="slide level-2" id="conversion">
+<h2>Conversion</h2>
+<p>Existing FreeBSD installations require conversion of the pkg_install package
+database to the new format. To convert the package database, run:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="c"># pkg2ng</span>
+</pre></div>
+</div>
+<p>This step is not required for new installations that do not have third-party
+software installed.</p>
+<div class="admonition-warning admonition">
+<p class="first admonition-title">WARNING</p>
+<p class="last">This step is not reversible. Once the package database has been
+converted to the pkgng format, the pkg_install tools should not be used.</p>
+</div>
+
+</article>
+<article class="slide level-2" id="configuration">
+<h2>Configuration</h2>
+<p>To ensure the FreeBSD Ports Collection registers new software with <tt class="docutils literal"><span class="pre">pkgng</span></tt>, and
+not <tt class="docutils literal"><span class="pre">pkg_install</span></tt>, FreeBSD versions earlier than 10.X require this line in
+<tt class="docutils literal"><span class="pre">/etc/make.conf</span></tt>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">WITH_PKGNG</span><span class="o">=</span><span class="n">YES</span>
+</pre></div>
+</div>
+
+</article>
+<article class="slide level-2" id="configuring-the-pkgng-environment">
+<h2>Configuring the pkgng Environment</h2>
+<p>The pkgng package management system uses a package repository for most
+operations. The default package repository location is defined in
+<tt class="docutils literal"><span class="pre">/usr/local/etc/pkg.conf</span></tt> or the <tt class="docutils literal"><span class="pre">PACKAGESITE</span></tt> environment variable, which
+overrides the configuration file.</p>
+<p><strong>/usr/local/etc/pkg.conf:</strong></p>
+<div class="highlight-bash"><div class="highlight"><pre>PACKAGESITE: http://example.org/pkgng-repo/
+</pre></div>
+</div>
+<p><strong>PACKAGESITE variable</strong></p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="c"># setenv PACKAGESITE http://example.org/pkgng-repo/</span>
+<span class="c"># export PACKAGESITE=http://example.org/pkgng-repo/</span>
+</pre></div>
+</div>
+
+</article>
+<article class="slide level-2" id="working-with-multiple-repositories">
+<h2>Working with multiple repositories</h2>
+<p>It is possible to use multiple repositories with pkgng. In order to enable this
+functionality, add <tt class="docutils literal"><span class="pre">PKG_MULTIREPOS</span> <span class="pre">:</span> <span class="pre">YES</span></tt> to <tt class="docutils literal"><span class="pre">/usr/local/etc/pkg.conf</span></tt>.</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="c"># echo &quot;PKG_MULTIREPOS : YES&quot; &gt;&gt; /usr/local/etc/pkg.conf</span>
+</pre></div>
+</div>
+
+</article>
+<article class="slide level-2" id="repos">
+<h2>repos</h2>
+<div class="highlight-bash"><div class="highlight"><pre>repos:
+  default : http://example.org/pkgng/
+  repo1 : http://somewhere.org/pkgng/repo1/
+  repo2 : http://somewhere.org/pkgng/repo2/
+</pre></div>
+</div>
+<p>It is important that you always define a default repository - this is the
+repository that is being used when no remote repositories are specified via the
+-r &lt;repo&gt; flag.</p>
+<p>And now you can install from the remote repositories using the pkg install
+command like this:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="c"># pkg install -r repo1 py27-salt py27-salt-cloud</span>
+</pre></div>
+</div>
+
+</article>
+<article class="slide level-1" id="basic-pkgng-operations">
+<h1>Basic pkgng Operations</h1>
+
+</article>
+<article class="slide level-2" id="usage-information">
+<h2>Usage Information</h2>
+<p>Usage information for pkgng is available in the <tt class="docutils literal"><span class="pre">pkg(8)</span></tt> manual page, or by
+running <tt class="docutils literal"><span class="pre">pkg</span></tt> without additional arguments.</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="c"># pkg help</span>
+<span class="c"># man pkg</span>
+</pre></div>
+</div>
+
+</article>
+<article class="slide level-3" id="usage-information-example">
+<h3>Usage Information (Example)</h3>
+<p>Each <tt class="docutils literal"><span class="pre">pkgng</span></tt> command argument is documented in a command-specific manual page. To
+read the manual page for pkg install, for example, run either:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="c"># pkg help install</span>
+<span class="c"># man pkg-install</span>
+</pre></div>
+</div>
+
+</article>
+<article class="slide level-2" id="querying-installed-packages">
+<h2>Querying Installed Packages</h2>
+<p>Information about all installed packages is available by running:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="c"># pkg info</span>
+</pre></div>
+</div>
+
+</article>
+<article class="slide level-3" id="querying-installed-packages-example">
+<h3>Querying Installed Packages (Example)</h3>
+<p>For example, to see which version of pkgng is installed on the system, run:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="c"># pkg info pkg</span>
+pkg-1.0.2           New generation package manager
+</pre></div>
+</div>
+
+</article>
+<article class="slide level-2" id="installing-packages">
+<h2>Installing Packages</h2>
+<p>Most FreeBSD users will install binary packages by running:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="c"># pkg install packagename</span>
+<span class="c"># pkg install packageorigin</span>
+</pre></div>
+</div>
+
+</article>
+<article class="slide level-3" id="installing-packages-example">
+<h3>Installing Packages (Example)</h3>
+<div class="highlight-bash"><div class="highlight"><pre><span class="c"># pkg install curl</span>
+Updating repository catalogue
+Repository catalogue is up-to-date, no need to fetch fresh copy
+The following packages will be installed:
+
+Installing ca_root_nss: 3.13.5
+Installing curl: 7.24.0
+
+The installation will require 4 MB more space
+
+1 MB to be downloaded
+
+Proceed with installing packages <span class="o">[</span>y/N<span class="o">]</span>: y
+ca_root_nss-3.13.5.txz      100%    255KB   255.1KB/s 255.1KB/s 00:00
+curl-7.24.0.txz             100%    1108KB  1.1MB/s 1.1MB/s     00:00
+Checking integrity... <span class="k">done</span>
+Installing ca_root_nss-3.13.5... <span class="k">done</span>
+Installing curl-7.24.0... <span class="k">done</span>
+</pre></div>
+</div>
+
+</article>
+<article class="slide level-2" id="removing-packages">
+<h2>Removing Packages</h2>
+<p>Packages that are no longer needed can be removed with pkg delete.</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="c"># pkg delete packagename</span>
+</pre></div>
+</div>
+
+</article>
+<article class="slide level-3" id="removing-packages-example">
+<h3>Removing Packages (Example)</h3>
+<div class="highlight-bash"><div class="highlight"><pre><span class="c"># pkg delete curl</span>
+The following packages will be deleted:
+
+curl-7.24.0_1
+
+The deletion will free 3 MB
+
+Proceed with deleting packages <span class="o">[</span>y/N<span class="o">]</span>: y
+Deleting curl-7.24.0_1... <span class="k">done</span>
+</pre></div>
+</div>
+
+</article>
+<article class="slide level-2" id="upgrading-installed-packages">
+<h2>Upgrading Installed Packages</h2>
+<p>Packages that are outdated can be found with pkg version. If a local ports tree
+does not exist, pkg-version(8) will use the remote repository catalogue,
+otherwise the local ports tree will be used to identify package versions.</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="c"># pkg upgrade</span>
+Updating repository catalogue
+repo.txz        100%    297KB 296.5KB/s 296.5KB/s   00:00
+The following packages will be upgraded:
+
+Upgrading curl: 7.24.0 -&gt; 7.24.0_1
+1 MB to be downloaded
+
+Proceed with upgrading packages <span class="o">[</span>y/N<span class="o">]</span>: y
+curl-7.24.0_1.txz   100% 1108KB 1.1MB/s 1.1MB/s     00:00
+Checking integrity... <span class="k">done</span>
+Upgrading curl from 7.24.0 to 7.24.0_1... <span class="k">done</span>
+</pre></div>
+</div>
+
+</article>
+<article class="slide level-2" id="auditing-installed-packages">
+<h2>Auditing Installed Packages</h2>
+<p>Occasionally, software vulnerabilities may be discovered in software within the
+Ports Collection. pkgng includes built-in auditing, similar to the
+ports-mgmt/portaudit package. To audit the software installed on the system,
+run:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="c"># pkg audit -F</span>
+</pre></div>
+</div>
+
+</article>
+<article class="slide level-1" id="advanced-pkgng-operations">
+<h1>Advanced pkgng Operations</h1>
+
+</article>
+<article class="slide level-2" id="automatically-removing-leaf-dependencies">
+<h2>Automatically Removing Leaf Dependencies</h2>
+<p>Removing a package may leave behind unnecessary dependencies, like
+security/ca_root_nss in the example above. Such packages are still installed,
+but nothing depends on them any more. Unneeded packages that were installed as
+dependencies can be automatically detected and removed:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="c"># pkg autoremove</span>
+Packages to be autoremoved:
+    ca_root_nss-3.13.5
+
+The autoremoval will free 723 kB
+
+Proceed with autoremoval of packages <span class="o">[</span>y/N<span class="o">]</span>: y
+Deinstalling ca_root_nss-3.13.5... <span class="k">done</span>
+</pre></div>
+</div>
+
+</article>
+<article class="slide level-2" id="backing-up-the-pkgng-package-database">
+<h2>Backing Up the pkgng Package Database</h2>
+<p>Unlike the traditional package management system, pkgng includes its own
+package database backup mechanism. To manually back up the package database
+contents, run:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># pkg backup -d pkgng.db</span>
+</pre></div>
+</div>
+<p>Note: Replace the file name pkgng.db to a suitable file name.</p>
+
+</article>
+<article class="slide level-2" id="automatic-database-backup">
+<h2>Automatic Database Backup</h2>
+<p>Additionally, pkgng includes a periodic(8) script to automatically back up the
+package database daily if daily_backup_pkgng_enable is set to YES in
+periodic.conf(5).</p>
+<p>Tip: To prevent the pkg_install periodic script from also backing up the
+package database, set daily_backup_pkgdb_enable to NO in periodic.conf(5).</p>
+
+</article>
+<article class="slide level-2" id="restoring-the-pkgng-package-database">
+<h2>Restoring the pkgng Package Database</h2>
+<p>To restore the contents of a previous package database backup, run:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># pkg backup -r pkgng.db</span>
+</pre></div>
+</div>
+
+</article>
+<article class="slide level-2" id="removing-stale-pkgng-packages">
+<h2>Removing Stale pkgng Packages</h2>
+<p>By default, pkgng stores binary packages in a cache directory as defined by
+PKG_CACHEDIR in pkg.conf(5). When upgrading packages with pkg upgrade, old
+versions of the upgraded packages are not automatically removed.</p>
+<p>To remove the outdated binary packages, run:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="c"># pkg clean</span>
+</pre></div>
+</div>
+
+</article>
+<article class="slide level-1" id="implementing-pkgng">
+<h1>Implementing pkgng</h1>
+<p>The current problem with pkgng is that there are no publicly available
+packages. The current solution is to create your own repository for the
+packgaes you need.</p>
+
+</article>
+<article class="slide level-2" id="poudriere">
+<h2>poudriere</h2>
+<p>poudriere is a BSD-2 licensed tool primarily designed to test package
+production on FreeBSD. However, most people will find it useful to bulk build
+ports for FreeBSD.</p>
+<p>Its goals are to use modern facilities present in FreeBSD (as ZFS, jails), to
+be easy to use, to depend only on base, and to be parallel.</p>
+<p>It is able to build the whole portstree like tinderbox does.</p>
+<p>poudriere is able to build packages for versions of FreeBSD that are different
+from the box on which it is installed, and also to build packages for i386 if
+the host is an amd64 box.</p>
+
+</article>
+<article class="slide level-2" id="install-poudriere">
+<h2>Install poudriere</h2>
+<div class="highlight-bash"><div class="highlight"><pre>make -C /usr/ports/ports-mgmt/poudriere install clean
+</pre></div>
+</div>
+
+</article>
+<article class="slide level-2" id="what-does-poudriere-require">
+<h2>What does poudriere require?</h2>
+<blockquote>
+<div><ul class="simple">
+<li>a recent FreeBSD (&gt;= 8.3)</li>
+<li>a ZFS pool with at least 7GB of free space root access</li>
+</ul>
+</div></blockquote>
+
+</article>
+<article class="slide level-2" id="usr-local-etc-poudriere-conf">
+<h2>/usr/local/etc/poudriere.conf</h2>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">BASEFS</span><span class="o">=</span>/poudriere
+<span class="nv">ZPOOL</span><span class="o">=</span>myzpool
+<span class="nv">FREEBSD_HOST</span><span class="o">=</span>ftp://ftp.freebsd.org
+<span class="nv">POUDRIERE_DATA</span><span class="o">=</span>/poudriere_data
+<span class="nv">RESOLV_CONF</span><span class="o">=</span>/etc/resolv.conf
+<span class="nv">DISTFILES_CACHE</span><span class="o">=</span>/usr/ports/distfiles
+</pre></div>
+</div>
+
+</article>
+<article class="slide level-2" id="create-ports-tree">
+<h2>create ports tree</h2>
+<div class="highlight-bash"><div class="highlight"><pre>poudriere ports -c
+</pre></div>
+</div>
+
+</article>
+<article class="slide level-2" id="create-the-build-jail">
+<h2>create the build jail</h2>
+<div class="highlight-bash"><div class="highlight"><pre>poudriere jail -c -j 91amd64 -v 9.1-RELEASE -a amd64
+poudriere jail -c -j 91i386 -v 9.1-RELEASE -a i386
+</pre></div>
+</div>
+
+</article>
+<article class="slide level-2" id="pkgng-compatibility">
+<h2>pkgng compatibility</h2>
+<div class="highlight-bash"><div class="highlight"><pre>mkdir /usr/local/etc/poudriere.d
+<span class="nb">echo</span> <span class="s2">&quot;WITH_PKGNG=yes&quot;</span> &gt; /usr/local/etc/poudriere.d/91amd64-make.conf
+<span class="nb">echo</span> <span class="s2">&quot;WITH_PKGNG=yes&quot;</span> &gt; /usr/local/etc/poudriere.d/91i386-make.conf
+</pre></div>
+</div>
+
+</article>
+<article class="slide level-2" id="configuring-options">
+<h2>Configuring options</h2>
+<p>Package options can be configured using the options subcommand.</p>
+<div class="highlight-bash"><div class="highlight"><pre>poudriere options -j 91amd64 -f ~/package.list
+</pre></div>
+</div>
+
+</article>
+<article class="slide level-2" id="begin-bulk-build">
+<h2>Begin bulk build</h2>
+<div class="highlight-bash"><div class="highlight"><pre>cat ~/package.list
+editors/vim-lite
+www/nginx
+</pre></div>
+</div>
+<div class="highlight-bash"><div class="highlight"><pre>poudriere bulk -f ~/package.list -j 91amd64
+poudriere bulk -f ~/package.list -l 91i386
+</pre></div>
+</div>
+
+</article>
+<article class="slide level-2" id="serve-the-content">
+<h2>Serve the content</h2>
+<blockquote>
+<div><ul class="simple">
+<li>nginx, apache, etc serves up the $POUDRIERE_DATA directory</li>
+<li>point PACKAGESITE to this webserver</li>
+<li>???</li>
+<li>profit!</li>
+</ul>
+</div></blockquote>
+
+</article>
+<article class="slide level-2" id="development">
+<h2>Development</h2>
+<blockquote>
+<div><ul class="simple">
+<li>IRC channel: <a class="reference external" href="mailto:#pkgng&#37;&#52;&#48;freenode">#pkgng<span>&#64;</span>freenode</a></li>
+<li>GIT repo: <a class="reference external" href="https://github.com/pkgng/pkgng">https://github.com/pkgng/pkgng</a></li>
+</ul>
+</div></blockquote>
+
+</article>
+<article class="slide level-2" id="credits">
+<h2>Credits</h2>
+<blockquote>
+<div><ul class="simple">
+<li>Christer Edwards</li>
+<li><a class="reference external" href="mailto:christer&#46;edwards&#37;&#52;&#48;gmail&#46;com">christer<span>&#46;</span>edwards<span>&#64;</span>gmail<span>&#46;</span>com</a></li>
+<li><a class="reference external" href="https://github.com/cedwards/pkgng-openwest.git">https://github.com/cedwards/pkgng-openwest.git</a></li>
+</ul>
+</div></blockquote>
+
+</article>
+
+
+</section>
+  </body>
+</html>
